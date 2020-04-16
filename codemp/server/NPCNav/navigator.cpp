@@ -179,7 +179,7 @@ void CNode::AddEdge( int ID, int cost, int flags )
 
 	m_numEdges++;
 
-	assert( m_numEdges < 9 );//8 is the max
+	assert( m_numEdges < 17 );//16 is the max
 }
 
 /*
