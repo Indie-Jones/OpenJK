@@ -2511,7 +2511,7 @@ void Cmd_MapList_f( gentity_t *ent ) {
 
 		page = atoi(arg1);
 
-		if (page == 0)
+		if (page == 0 || page > FILE_MAX_PAGE_NUMBER)
 		{
 			trap->SendServerCommand( ent-g_entities, "print \"Invalid page number\n\"" );
 			return;
@@ -12948,8 +12948,13 @@ void Cmd_ZykFile_f(gentity_t *ent) {
 	server_file = fopen(va("zykmod/%s.txt", arg1), "r");
 	if (server_file != NULL)
 	{
+		if (page > FILE_MAX_PAGE_NUMBER) {
+			trap->SendServerCommand(ent->s.number, "print \"Invalid page number\n\"");
+			return;
+		}
 		if (page > 0)
 		{ // zyk: show results of this page
+			
 			while (i < (results_per_page * (page - 1)))
 			{ // zyk: reads the file until it reaches the position corresponding to the page number
 				fgets(content, sizeof(content), server_file);
@@ -13482,7 +13487,7 @@ void Cmd_RemapList_f(gentity_t *ent) {
 	
 	page = atoi(arg1);
 
-	if (page == 0)
+	if (page == 0 || page > FILE_MAX_PAGE_NUMBER)
 	{
 		trap->SendServerCommand(ent->s.number, "print \"Invalid page number\n\"");
 		return;
@@ -16940,7 +16945,7 @@ void Cmd_DuelTable_f(gentity_t *ent) {
 
 	page = atoi(arg1);
 
-	if (page < 1)
+	if (page < 1 || page > FILE_MAX_PAGE_NUMBER)
 	{
 		trap->SendServerCommand(ent->s.number, "print \"Invalid page number\n\"");
 		return;
@@ -17442,6 +17447,10 @@ void Cmd_Tutorial_f(gentity_t *ent) {
 	tutorial_file = fopen("zykmod/tutorial.txt", "r");
 	if (tutorial_file != NULL)
 	{
+		if (page > FILE_MAX_PAGE_NUMBER) {
+			trap->SendServerCommand(ent->s.number, "print \"Invalid page number\n\"");
+			return;
+		}
 		if (page > 0)
 		{ // zyk: show results of this page
 			while (i < (results_per_page * (page - 1)))
@@ -18606,7 +18615,7 @@ void Cmd_DuelBoard_f(gentity_t *ent) {
 
 	page = atoi(arg1);
 
-	if (page == 0)
+	if (page == 0 || page > FILE_MAX_PAGE_NUMBER)
 	{
 		trap->SendServerCommand(ent->s.number, "print \"Invalid page number\n\"");
 		return;

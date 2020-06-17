@@ -632,6 +632,9 @@ typedef enum {
 // zyk: duration of the duelists protection in Duel Tournament
 #define DUEL_TOURNAMENT_PROTECTION_TIME 2000
 
+// Indie-Jones: Max page number of a file that can be displayed
+#define FILE_MAX_PAGE_NUMBER 9000
+
 // client data that stays across multiple respawns, but is cleared
 // on each level change or team change at ClientBegin()
 typedef struct clientPersistant_s {
