@@ -13442,11 +13442,9 @@ void Cmd_Remap_f( gentity_t *ent ) {
 		return;
 	}
 
-
-	trap->SendServerCommand( ent-g_entities, va("print \"number_of_args: %d\n\"", number_of_args));
-
 	if ( number_of_args < 2 ) {
 		trap->SendServerCommand( ent-g_entities, va("print \"You must specify an action [add|remove|undo]. \nExamples:\n^3/remap add models/weapons2/heavy_repeater/heavy_repeater_w.glm models/items/bacta\n/remap remove 4\n/remap undo (removes last recently added remap)\n\""));
+		return;
 	}
 
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
