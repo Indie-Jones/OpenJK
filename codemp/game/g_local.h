@@ -1975,6 +1975,7 @@ void G_AddEvent( gentity_t *ent, int event, int eventParm );
 void G_SetOrigin( gentity_t *ent, vec3_t origin );
 qboolean G_CheckInSolid (gentity_t *self, qboolean fix);
 void AddRemap(const char *oldShader, const char *newShader, float timeOffset);
+int RemoveRemap(int index);
 const char *BuildShaderStateConfig(void);
 /*
 Ghoul2 Insert Start
