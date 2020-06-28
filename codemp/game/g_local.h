@@ -1843,9 +1843,11 @@ typedef struct shaderRemap_s {
   float timeOffset;
 } shaderRemap_t;
 
-#define MAX_SHADER_REMAPS 128
+#define MAX_SHADER_REMAPS 512
 
 extern shaderRemap_t remappedShaders[MAX_SHADER_REMAPS];
+extern shaderRemap_t removedRemappedShaders[MAX_SHADER_REMAPS];
+
 
 //
 // g_spawn.c
