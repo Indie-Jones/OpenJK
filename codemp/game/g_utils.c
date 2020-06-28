@@ -28,8 +28,10 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "qcommon/q_shared.h"
 
 int remapCount = 0;
+int removedRemapCount = 0;
 
 shaderRemap_t remappedShaders[MAX_SHADER_REMAPS] = {0};
+shaderRemap_t removedRemappedShaders[MAX_SHADER_REMAPS] = {0};
 
 int zyk_get_remap_count()
 {
@@ -55,6 +57,36 @@ void AddRemap(const char *oldShader, const char *newShader, float timeOffset) {
 	}
 }
 
+/*
+=========
+RemoveRemap
+
+Removes a remap from remappedShaders.
+=========
+*/
+int RemoveRemap(int index) {
+	if (index < 0 || index >= remapCount || remapCount == 0) {
+		return 1; // remap at index doesn't exist
+	}
+	// we need to reset the shader first
+	strcpy(removedRemappedShaders[index].newShader, remappedShaders[index].oldShader);
+	strcpy(removedRemappedShaders[index].oldShader, remappedShaders[index].oldShader);
+	removedRemappedShaders[index].timeOffset = remappedShaders[index].timeOffset;
+	removedRemapCount++;
+
+
+	// Order in remappedShaders[] doesn't matter, so we replace the remap at index with the last entry.
+	if (index != remapCount - 1) {
+		strcpy(remappedShaders[index].newShader, remappedShaders[remapCount - 1].newShader);
+		strcpy(remappedShaders[index].oldShader, remappedShaders[remapCount - 1].oldShader);
+		remappedShaders[index].timeOffset = remappedShaders[remapCount - 1].timeOffset;
+	
+		
+	}
+	remapCount--;
+	return 0;
+}
+
 const char *BuildShaderStateConfig(void) {
 	static char	buff[MAX_STRING_CHARS*4];
 	char out[(MAX_QPATH * 2) + 5];
@@ -65,6 +97,11 @@ const char *BuildShaderStateConfig(void) {
 		Com_sprintf(out, (MAX_QPATH * 2) + 5, "%s=%s:%5.2f@", remappedShaders[i].oldShader, remappedShaders[i].newShader, remappedShaders[i].timeOffset);
 		Q_strcat( buff, sizeof( buff ), out);
 	}
+	for (i = 0; i < removedRemapCount; i++) {
+		Com_sprintf(out, (MAX_QPATH * 2) + 5, "%s=%s:%5.2f@", removedRemappedShaders[i].oldShader, removedRemappedShaders[i].newShader, removedRemappedShaders[i].timeOffset);
+		Q_strcat( buff, sizeof( buff ), out);
+	}
+	removedRemapCount = 0;
 	return buff;
 }
 

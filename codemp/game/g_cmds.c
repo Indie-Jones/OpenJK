@@ -13433,6 +13433,7 @@ void Cmd_Remap_f( gentity_t *ent ) {
 	int number_of_args = trap->Argc();
 	char arg1[MAX_STRING_CHARS];
 	char arg2[MAX_STRING_CHARS];
+	char arg3[MAX_STRING_CHARS];
 	float f = level.time * 0.001;
 
 	if (!(ent->client->pers.bitvalue & (1 << ADM_ENTITYSYSTEM)))
@@ -13441,19 +13442,48 @@ void Cmd_Remap_f( gentity_t *ent ) {
 		return;
 	}
 
-	if ( number_of_args < 3)
-	{
-		trap->SendServerCommand( ent-g_entities, va("print \"You must specify the old shader and new shader. Ex: ^3/remap models/weapons2/heavy_repeater/heavy_repeater_w.glm models/items/bacta^7\n\"") );
+	if ( number_of_args < 1 ) {
+		trap->SendServerCommand( ent-g_entities, va("print \"You must specify an action [add|remove|undo]. \nEx: ^3/remap add models/weapons2/heavy_repeater/heavy_repeater_w.glm models/items/bacta^7\nEx: ^3/remap remove 4\n/remap undo (removes last recently added remap)\n\""));
 		return;
 	}
-
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
-	trap->Argv( 2, arg2, sizeof( arg2 ) );
 
-	AddRemap(G_NewString(arg1), G_NewString(arg2), f);
-	trap->SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
+	if ( !Q_stricmp(arg1, "undo" ) ) {
+		RemoveRemap( zyk_get_remap_count() - 1 );
+		trap->SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
+		return;
+	}
+	if ( !Q_stricmp(arg1, "add" ) ) {
+		if ( number_of_args < 3) {
+			trap->SendServerCommand( ent-g_entities, va("print \"You must specify an old shader and new shader. \nEx: ^3/remap add models/weapons2/heavy_repeater/heavy_repeater_w.glm models/items/bacta^7\n\""));
+			return;
+		}
 
-	trap->SendServerCommand( ent-g_entities, "print \"Shader remapped\n\"" );
+		trap->Argv( 2, arg2, sizeof( arg2 ) );
+		trap->Argv( 3, arg3, sizeof( arg3 ) );
+
+		AddRemap(G_NewString(arg2), G_NewString(arg3), f);
+		trap->SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
+
+		trap->SendServerCommand( ent-g_entities, "print \"Shader remapped\n\"" );
+		return;
+	}
+	if ( !Q_stricmp(arg1, "remove") ) {
+		if ( number_of_args < 2) {
+			trap->SendServerCommand( ent-g_entities, va("print \"^3You must specify an index. Ex: /remap remove 4\n\""));
+		}
+		
+		trap->Argv( 2, arg2, sizeof( arg2 ) );
+
+		if ( RemoveRemap( atoi(arg2) ) ) {
+			trap->SendServerCommand( ent-g_entities, va("print \"^3No Remap with this Index!\n\""));
+		} else {
+			trap->SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
+			trap->SendServerCommand( ent-g_entities, "print \"Shader remap removed\n\"" );
+		}
+		return;
+	}
+	trap->SendServerCommand( ent-g_entities, "print \"Invalid remap command!\n\"" );
 }
 
 /*
@@ -13498,7 +13528,7 @@ void Cmd_RemapList_f(gentity_t *ent) {
 
 	while (i < (results_per_page * page) && i < zyk_get_remap_count())
 	{
-		strcpy(content, va("%s%s - %s\n", content, remappedShaders[i].oldShader, remappedShaders[i].newShader));
+		strcpy(content, va("%s[%d] %s - %s\n", content, i, remappedShaders[i].oldShader, remappedShaders[i].newShader));
 		i++;
 	}
 
