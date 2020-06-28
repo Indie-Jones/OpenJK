@@ -69,9 +69,9 @@ int RemoveRemap(int index) {
 		return 1; // remap at index doesn't exist
 	}
 	// we need to reset the shader first
-	strcpy(removedRemappedShaders[index].newShader, remappedShaders[index].oldShader);
-	strcpy(removedRemappedShaders[index].oldShader, remappedShaders[index].oldShader);
-	removedRemappedShaders[index].timeOffset = remappedShaders[index].timeOffset;
+	strcpy(removedRemappedShaders[removedRemapCount].newShader, remappedShaders[index].oldShader);
+	strcpy(removedRemappedShaders[removedRemapCount].oldShader, remappedShaders[index].oldShader);
+	removedRemappedShaders[removedRemapCount].timeOffset = remappedShaders[index].timeOffset;
 	removedRemapCount++;
 
 
