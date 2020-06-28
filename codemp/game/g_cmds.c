@@ -13442,10 +13442,13 @@ void Cmd_Remap_f( gentity_t *ent ) {
 		return;
 	}
 
-	if ( number_of_args < 1 ) {
-		trap->SendServerCommand( ent-g_entities, va("print \"You must specify an action [add|remove|undo]. \nEx: ^3/remap add models/weapons2/heavy_repeater/heavy_repeater_w.glm models/items/bacta^7\nEx: ^3/remap remove 4\n/remap undo (removes last recently added remap)\n\""));
-		return;
+
+	trap->SendServerCommand( ent-g_entities, va("print \"number_of_args: %d\n\"", number_of_args));
+
+	if ( number_of_args < 2 ) {
+		trap->SendServerCommand( ent-g_entities, va("print \"You must specify an action [add|remove|undo]. \nExamples:\n^3/remap add models/weapons2/heavy_repeater/heavy_repeater_w.glm models/items/bacta\n/remap remove 4\n/remap undo (removes last recently added remap)\n\""));
 	}
+
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 
 	if ( !Q_stricmp(arg1, "undo" ) ) {
@@ -13454,7 +13457,7 @@ void Cmd_Remap_f( gentity_t *ent ) {
 		return;
 	}
 	if ( !Q_stricmp(arg1, "add" ) ) {
-		if ( number_of_args < 3) {
+		if ( number_of_args < 4) {
 			trap->SendServerCommand( ent-g_entities, va("print \"You must specify an old shader and new shader. \nEx: ^3/remap add models/weapons2/heavy_repeater/heavy_repeater_w.glm models/items/bacta^7\n\""));
 			return;
 		}
@@ -13469,8 +13472,9 @@ void Cmd_Remap_f( gentity_t *ent ) {
 		return;
 	}
 	if ( !Q_stricmp(arg1, "remove") ) {
-		if ( number_of_args < 2) {
+		if ( number_of_args < 3) {
 			trap->SendServerCommand( ent-g_entities, va("print \"^3You must specify an index. Ex: /remap remove 4\n\""));
+			return;
 		}
 		
 		trap->Argv( 2, arg2, sizeof( arg2 ) );
@@ -13483,7 +13487,7 @@ void Cmd_Remap_f( gentity_t *ent ) {
 		}
 		return;
 	}
-	trap->SendServerCommand( ent-g_entities, "print \"Invalid remap command!\n\"" );
+	trap->SendServerCommand( ent-g_entities, va("print \"You must specify an action [add|remove|undo]. \nExamples:\n^3/remap add models/weapons2/heavy_repeater/heavy_repeater_w.glm models/items/bacta\n/remap remove 4\n/remap undo (removes last recently added remap)\n\""));
 }
 
 /*
@@ -13528,7 +13532,7 @@ void Cmd_RemapList_f(gentity_t *ent) {
 
 	while (i < (results_per_page * page) && i < zyk_get_remap_count())
 	{
-		strcpy(content, va("%s[%d] %s - %s\n", content, i, remappedShaders[i].oldShader, remappedShaders[i].newShader));
+		strcpy(content, va("%s[ %d ] %s - %s\n", content, i, remappedShaders[i].oldShader, remappedShaders[i].newShader));
 		i++;
 	}
 
