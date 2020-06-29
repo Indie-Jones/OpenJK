@@ -88,7 +88,7 @@ int RemoveRemap(int index) {
 }
 
 const char *BuildShaderStateConfig(void) {
-	static char	buff[MAX_STRING_CHARS*4];
+	static char	buff[MAX_STRING_CHARS*30];
 	char out[(MAX_QPATH * 2) + 5];
 	int i;
 
