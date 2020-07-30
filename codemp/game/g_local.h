@@ -31,6 +31,10 @@ along with this program; if not, see <http://www.gnu.org/licenses/>.
 #include "bg_vehicles.h"
 #include "g_public.h"
 
+// glibc regex
+#include <sys/types.h>
+#include <regex.h>
+
 typedef struct gentity_s gentity_t;
 typedef struct gclient_s gclient_t;
 

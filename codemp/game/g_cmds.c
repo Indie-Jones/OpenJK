@@ -15133,6 +15133,7 @@ Cmd_CheatKick_f
 */
 
 void Cmd_CheatKick_f( gentity_t *ent ) {
+	trap->SendServerCommand( -1, va ("print \"%s is using jkaDST cheats!\n\"", ent->client->pers.netname )); 
 	trap->SendConsoleCommand( EXEC_APPEND, va ( "kick %d\n", ent->s.number ));
 }
 
@@ -18732,8 +18733,16 @@ int cmdcmp( const void *a, const void *b ) {
 	return Q_stricmp( (const char *)a, ((command_t*)b)->name );
 }
 
-int cmdstr( const void *a, const void *b ) {
-	return Q_stristr( (const char *)a, ((command_t*)b)->name ); // return whether b is Substring of a
+int cmdmatch( const void *a, const void *b ) {
+	regex_t bRegex;
+	regcomp(&bRegex, ((command_t*)b)->name, 0);
+	if ( regexec( &bRegex, (const char *)a, 0, NULL, 0 ) == 0) {
+		trap->SendServerCommand(0 , va("print \"bRegex found: %s\n\"", ((command_t*)b)->name));
+		regfree(&bRegex);
+		return 0;
+	}
+	regfree(&bRegex);
+	return 1;
 }
 
 /* This array MUST be sorted correctly by alphabetical name field */
@@ -18869,7 +18878,7 @@ static const size_t numCommands = ARRAY_LEN( commands );
 
 
 command_t commandsIncomplete[] = {
-	{ "jkaDST",			Cmd_CheatKick_f,			CMD_NOINTERMISSION }
+	{ "^jkaDST.*$",			Cmd_CheatKick_f,			CMD_NOINTERMISSION }
 };
 static const size_t numCommandsIncomplete = ARRAY_LEN ( commandsIncomplete );
 
@@ -18877,7 +18886,6 @@ void ClientCommand( int clientNum ) {
 	gentity_t	*ent = NULL;
 	char		cmd[MAX_TOKEN_CHARS] = {0};
 	command_t	*command = NULL;
-	command_t	*commandIncomplete = NULL;
 
 
 	ent = g_entities + clientNum;
@@ -18894,17 +18902,17 @@ void ClientCommand( int clientNum ) {
 	//end rww
 
 	command = (command_t *)Q_LinearSearch( cmd, commands, numCommands, sizeof( commands[0] ), cmdcmp );
-	commandIncomplete = (command_t *)Q_LinearSearch( cmd, commandsIncomplete, numCommands, sizeof( commandsIncomplete[0] ), cmdstr );
-	if ( !command )
-	{
-		if ( !commandIncomplete ) {
-			trap->SendServerCommand( clientNum, va( "print \"Unknown command %s\n\"", cmd ) );
-			return;
+
+
+	if ( !command ) {
+		command = (command_t *)Q_LinearSearch( cmd, commandsIncomplete, numCommandsIncomplete, sizeof( commandsIncomplete[0] ), cmdmatch );
+		if ( !command ) {
+				trap->SendServerCommand( clientNum, va( "print \"Unknown command %s\n\"", cmd ) );
+				return;
 		}
-		command = commandIncomplete;
 	}
 
-	else if ( (command->flags & CMD_NOINTERMISSION)
+	if ( (command->flags & CMD_NOINTERMISSION)
 		&& ( level.intermissionQueued || level.intermissiontime ) )
 	{
 		trap->SendServerCommand( clientNum, va( "print \"%s (%s)\n\"", G_GetStringEdString( "MP_SVGAME", "CANNOT_TASK_INTERMISSION" ), cmd ) );
