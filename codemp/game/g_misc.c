@@ -1138,7 +1138,9 @@ void SP_misc_bsp(gentity_t *ent)
 	trap->LinkEntity ((sharedEntity_t *)ent);
 
 	trap->SetActiveSubBSP(ent->s.modelindex);
-	G_SpawnEntitiesFromString(qtrue);
+	if(!(ent->spawnflags & 1)) {
+		G_SpawnEntitiesFromString(qtrue);
+	}
 	trap->SetActiveSubBSP(-1);
 
 	level.mBSPInstanceDepth--;
@@ -4638,7 +4640,6 @@ int	TAG_GetAngles( const char *owner, const char *name, vec3_t angles )
 
 	if (!tag)
 	{
-		assert(0);
 		return 0;
 	}
 
