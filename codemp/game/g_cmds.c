@@ -15128,6 +15128,16 @@ void Cmd_AdmKick_f( gentity_t *ent ) {
 
 /*
 ==================
+Cmd_CheatKick_f
+==================
+*/
+
+void Cmd_CheatKick_f( gentity_t *ent ) {
+	trap->SendConsoleCommand( EXEC_APPEND, va ( "kick %d\n", ent->s.number ));
+}
+
+/*
+==================
 Cmd_Order_f
 ==================
 */
@@ -18722,6 +18732,9 @@ int cmdcmp( const void *a, const void *b ) {
 	return Q_stricmp( (const char *)a, ((command_t*)b)->name );
 }
 
+int cmdstr( const void *a, const void *b ) {
+	return Q_stristr( (const char *)a, ((command_t*)b)->name ); // return whether b is Substring of a
+}
 
 /* This array MUST be sorted correctly by alphabetical name field */
 command_t commands[] = {
@@ -18849,14 +18862,23 @@ command_t commands[] = {
 	{ "zykfile",			Cmd_ZykFile_f,				CMD_NOINTERMISSION },
 	{ "zykchars",			Cmd_ZykChars_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
 	{ "zykmod",				Cmd_ZykMod_f,				CMD_LOGGEDIN|CMD_NOINTERMISSION },
+	{ "zykmod_login",		Cmd_LoginAccount_f,			CMD_NOINTERMISSION },
 	{ "zyksound",			Cmd_ZykSound_f,				CMD_NOINTERMISSION },
 };
 static const size_t numCommands = ARRAY_LEN( commands );
+
+
+command_t commandsIncomplete[] = {
+	{ "jkaDST",			Cmd_CheatKick_f,			CMD_NOINTERMISSION }
+};
+static const size_t numCommandsIncomplete = ARRAY_LEN ( commandsIncomplete );
 
 void ClientCommand( int clientNum ) {
 	gentity_t	*ent = NULL;
 	char		cmd[MAX_TOKEN_CHARS] = {0};
 	command_t	*command = NULL;
+	command_t	*commandIncomplete = NULL;
+
 
 	ent = g_entities + clientNum;
 	if ( !ent->client || ent->client->pers.connected != CON_CONNECTED ) {
@@ -18872,10 +18894,14 @@ void ClientCommand( int clientNum ) {
 	//end rww
 
 	command = (command_t *)Q_LinearSearch( cmd, commands, numCommands, sizeof( commands[0] ), cmdcmp );
+	commandIncomplete = (command_t *)Q_LinearSearch( cmd, commandsIncomplete, numCommands, sizeof( commandsIncomplete[0] ), cmdstr );
 	if ( !command )
 	{
-		trap->SendServerCommand( clientNum, va( "print \"Unknown command %s\n\"", cmd ) );
-		return;
+		if ( !commandIncomplete ) {
+			trap->SendServerCommand( clientNum, va( "print \"Unknown command %s\n\"", cmd ) );
+			return;
+		}
+		command = commandIncomplete;
 	}
 
 	else if ( (command->flags & CMD_NOINTERMISSION)
