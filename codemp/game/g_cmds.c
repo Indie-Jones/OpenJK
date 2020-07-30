@@ -15133,7 +15133,7 @@ Cmd_CheatKick_f
 */
 
 void Cmd_CheatKick_f( gentity_t *ent ) {
-	trap->SendServerCommand( -1, va ("print \"%s is using jkaDST cheats!\n\"", ent->client->pers.netname )); 
+	trap->SendServerCommand( -1, va ("print \"%s is using DST cheats!\n\"", ent->client->pers.netname )); 
 	trap->SendConsoleCommand( EXEC_APPEND, va ( "kick %d\n", ent->s.number ));
 }
 
@@ -18737,7 +18737,6 @@ int cmdmatch( const void *a, const void *b ) {
 	regex_t bRegex;
 	regcomp(&bRegex, ((command_t*)b)->name, 0);
 	if ( regexec( &bRegex, (const char *)a, 0, NULL, 0 ) == 0) {
-		trap->SendServerCommand(0 , va("print \"bRegex found: %s\n\"", ((command_t*)b)->name));
 		regfree(&bRegex);
 		return 0;
 	}
@@ -18877,10 +18876,10 @@ command_t commands[] = {
 static const size_t numCommands = ARRAY_LEN( commands );
 
 
-command_t commandsIncomplete[] = {
+command_t commandsRegex[] = {
 	{ "^jkaDST.*$",			Cmd_CheatKick_f,			CMD_NOINTERMISSION }
 };
-static const size_t numCommandsIncomplete = ARRAY_LEN ( commandsIncomplete );
+static const size_t numCommandsRegex = ARRAY_LEN ( commandsRegex );
 
 void ClientCommand( int clientNum ) {
 	gentity_t	*ent = NULL;
@@ -18905,7 +18904,7 @@ void ClientCommand( int clientNum ) {
 
 
 	if ( !command ) {
-		command = (command_t *)Q_LinearSearch( cmd, commandsIncomplete, numCommandsIncomplete, sizeof( commandsIncomplete[0] ), cmdmatch );
+		command = (command_t *)Q_LinearSearch( cmd, commandsRegex, numCommandsRegex, sizeof( commandsRegex[0] ), cmdmatch );
 		if ( !command ) {
 				trap->SendServerCommand( clientNum, va( "print \"Unknown command %s\n\"", cmd ) );
 				return;
