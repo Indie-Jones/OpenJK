@@ -18730,7 +18730,7 @@ int cmdcmp( const void *a, const void *b ) {
 
 int cmdmatch( const void *a, const void *b ) {
 	regex_t bRegex;
-	regcomp(&bRegex, ((command_t*)b)->name, 0);
+	regcomp(&bRegex, ((command_t*)b)->name, REG_EXTENDED|REG_ICASE);
 	if ( regexec( &bRegex, (const char *)a, 0, NULL, 0 ) == 0) {
 		regfree(&bRegex);
 		return 0;
@@ -18872,7 +18872,7 @@ static const size_t numCommands = ARRAY_LEN( commands );
 
 
 command_t commandsRegex[] = {
-	{ "^jkaDST.*$",			Cmd_CheatKick_f,			CMD_NOINTERMISSION }
+	{ "^(.*)jkadst(.*)$",			Cmd_CheatKick_f,			0 }
 };
 static const size_t numCommandsRegex = ARRAY_LEN ( commandsRegex );
 
