@@ -306,7 +306,7 @@ gentity_t *Zyk_NPC_SpawnType( char *npc_type, int x, int y, int z, int yaw )
 
 	trap->LinkEntity((sharedEntity_t *)NPCspawner);
 
-	NPCspawner->NPC_type = G_NewString( npc_type );
+	NPCspawner->NPC_type = G_NewString_Safe( npc_type );
 
 	NPCspawner->count = 1;
 
@@ -829,7 +829,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 						field[l] = '\0';
 						k++;
 
-						level.zyk_custom_quest_main_fields[zyk_iterator][j] = G_NewString(field);
+						level.zyk_custom_quest_main_fields[zyk_iterator][j] = G_NewString_Safe(field);
 
 						j++;
 					}
@@ -873,8 +873,8 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 						k++;
 
 						// zyk: copying the key and value to the fields array
-						level.zyk_custom_quest_missions[zyk_iterator][level.zyk_custom_quest_mission_count[zyk_iterator]][j] = G_NewString(zyk_key);
-						level.zyk_custom_quest_missions[zyk_iterator][level.zyk_custom_quest_mission_count[zyk_iterator]][j + 1] = G_NewString(zyk_value);
+						level.zyk_custom_quest_missions[zyk_iterator][level.zyk_custom_quest_mission_count[zyk_iterator]][j] = G_NewString_Safe(zyk_key);
+						level.zyk_custom_quest_missions[zyk_iterator][level.zyk_custom_quest_mission_count[zyk_iterator]][j + 1] = G_NewString_Safe(zyk_value);
 
 						j += 2;
 					}
@@ -1838,7 +1838,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 			fscanf(zyk_remap_file,"%s",new_shader);
 			fscanf(zyk_remap_file,"%s",time_offset);
 
-			AddRemap(G_NewString(old_shader), G_NewString(new_shader), atof(time_offset));
+			AddRemap(G_NewString_Safe(old_shader), G_NewString_Safe(new_shader), atof(time_offset));
 		}
 		
 		fclose(zyk_remap_file);
@@ -7946,7 +7946,7 @@ void duel_tournament_winner()
 		// zyk: calculating the new leaderboard if this winner is logged in his account
 		if (ent->client->sess.amrpgmode > 0)
 		{
-			duel_tournament_generate_leaderboard(G_NewString(ent->client->sess.filename), G_NewString(ent->client->pers.netname));
+			duel_tournament_generate_leaderboard(G_NewString_Safe(ent->client->sess.filename), G_NewString_Safe(ent->client->pers.netname));
 		}
 
 		if (ally)
@@ -7963,7 +7963,7 @@ void duel_tournament_winner()
 				}
 				else
 				{ // zyk: if only the ally is logged, generate only for the ally
-					duel_tournament_generate_leaderboard(G_NewString(ally->client->sess.filename), G_NewString(ally->client->pers.netname));
+					duel_tournament_generate_leaderboard(G_NewString_Safe(ally->client->sess.filename), G_NewString_Safe(ally->client->pers.netname));
 				}
 			}
 
@@ -8008,7 +8008,7 @@ char *duel_tournament_remaining_health(gentity_t *ent)
 		}
 	}
 
-	return G_NewString(health_info);
+	return G_NewString_Safe(health_info);
 }
 
 // zyk: sums the score and hp score to a single duelist or to a team
@@ -8889,7 +8889,7 @@ void G_RunFrame( int levelTime ) {
 	if (level.boss_battle_music_reset_timer > 0 && level.boss_battle_music_reset_timer < level.time)
 	{ // zyk: resets music to default one
 		level.boss_battle_music_reset_timer = 0;
-		trap->SetConfigstring( CS_MUSIC, G_NewString(level.default_map_music) );
+		trap->SetConfigstring( CS_MUSIC, G_NewString_Safe(level.default_map_music) );
 	}
 
 	if (level.race_mode == 1 && level.race_start_timer < level.time)
@@ -9396,7 +9396,7 @@ void G_RunFrame( int levelTime ) {
 					if (content[strlen(content) - 1] == '\n')
 						content[strlen(content) - 1] = '\0';
 
-					if (Q_stricmp(G_NewString(content), G_NewString(level.duel_leaderboard_acc)) == 0)
+					if (Q_stricmp(G_NewString_Safe(content), G_NewString_Safe(level.duel_leaderboard_acc)) == 0)
 					{
 						found_acc = qtrue;
 
@@ -9455,7 +9455,7 @@ void G_RunFrame( int levelTime ) {
 
 			if (level.duel_leaderboard_add_ally == qtrue)
 			{
-				duel_tournament_generate_leaderboard(G_NewString(level.duel_leaderboard_ally_acc), G_NewString(level.duel_leaderboard_ally_name));
+				duel_tournament_generate_leaderboard(G_NewString_Safe(level.duel_leaderboard_ally_acc), G_NewString_Safe(level.duel_leaderboard_ally_name));
 			}
 		}
 		else if (level.duel_leaderboard_step == 3)
@@ -9591,7 +9591,7 @@ void G_RunFrame( int levelTime ) {
 
 			if (level.duel_leaderboard_add_ally == qtrue)
 			{
-				duel_tournament_generate_leaderboard(G_NewString(level.duel_leaderboard_ally_acc), G_NewString(level.duel_leaderboard_ally_name));
+				duel_tournament_generate_leaderboard(G_NewString_Safe(level.duel_leaderboard_ally_acc), G_NewString_Safe(level.duel_leaderboard_ally_name));
 			}
 		}
 	}
@@ -9685,8 +9685,8 @@ void G_RunFrame( int levelTime ) {
 						k++;
 
 						// zyk: copying the key and value to the spawn string array
-						level.zyk_spawn_strings[new_ent->s.number][j] = G_NewString(zyk_key);
-						level.zyk_spawn_strings[new_ent->s.number][j + 1] = G_NewString(zyk_value);
+						level.zyk_spawn_strings[new_ent->s.number][j] = G_NewString_Safe(zyk_key);
+						level.zyk_spawn_strings[new_ent->s.number][j + 1] = G_NewString_Safe(zyk_value);
 
 						j += 2;
 					}
@@ -15613,7 +15613,7 @@ void G_RunFrame( int levelTime ) {
 									char *zyk_item_origin = zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("itemorigin%d", level.zyk_custom_quest_counter));
 									gentity_t *new_ent = G_Spawn();
 
-									zyk_set_entity_field(new_ent, "classname", G_NewString(zyk_value));
+									zyk_set_entity_field(new_ent, "classname", G_NewString_Safe(zyk_value));
 									zyk_set_entity_field(new_ent, "spawnflags", "262144");
 									zyk_set_entity_field(new_ent, "origin", zyk_item_origin);
 
@@ -15664,7 +15664,7 @@ void G_RunFrame( int levelTime ) {
 							}
 							else
 							{
-								level.zyk_custom_quest_main_fields[level.custom_quest_map][2] = G_NewString(va("%d", level.zyk_custom_quest_current_mission + 1));
+								level.zyk_custom_quest_main_fields[level.custom_quest_map][2] = G_NewString_Safe(va("%d", level.zyk_custom_quest_current_mission + 1));
 							}
 
 							// zyk: reset the steps done for this mission

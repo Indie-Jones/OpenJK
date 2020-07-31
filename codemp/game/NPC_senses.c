@@ -947,7 +947,7 @@ void SP_target_interest( gentity_t *self )
 
 	if(self->target && self->target[0])
 	{
-		level.interestPoints[level.numInterestPoints].target = G_NewString( self->target );
+		level.interestPoints[level.numInterestPoints].target = G_NewString_Safe( self->target );
 	}
 
 	level.numInterestPoints++;

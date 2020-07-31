@@ -552,7 +552,7 @@ void Q3_Play( int taskID, int entID, const char *type, const char *name )
 		ent->roffid = trap->ROFF_Cache((char*)name);
 		if ( ent->roffid )
 		{
-			ent->roffname = G_NewString( name );
+			ent->roffname = G_NewString_Safe( name );
 
 			// Start the roff from the beginning
 			//ent->roff_ctr = 0;
@@ -2332,7 +2332,7 @@ static qboolean Q3_SetNavGoal( int entID, const char *name )
 			ent->NPC->aiFlags &= ~NPCAI_TOUCHED_GOAL;
 	#ifdef _DEBUG
 			//this is *only* for debugging navigation
-			ent->NPC->tempGoal->target = G_NewString( name );
+			ent->NPC->tempGoal->target = G_NewString_Safe( name );
 	#endif// _DEBUG
 		return qtrue;
 		}
@@ -3792,7 +3792,7 @@ static void Q3_SetTargetName (int entID, const char *targetname)
 	}
 	else
 	{
-		self->targetname = G_NewString( targetname );
+		self->targetname = G_NewString_Safe( targetname );
 	}
 }
 
@@ -3822,7 +3822,7 @@ static void Q3_SetTarget (int entID, const char *target)
 	}
 	else
 	{
-		self->target = G_NewString( target );
+		self->target = G_NewString_Safe( target );
 	}
 }
 
@@ -3853,7 +3853,7 @@ static void Q3_SetTarget2 (int entID, const char *target2)
 	}
 	else
 	{
-		self->target2 = G_NewString( target2 );
+		self->target2 = G_NewString_Safe( target2 );
 	}
 	*/
 }
@@ -3888,7 +3888,7 @@ static void Q3_SetRemoveTarget (int entID, const char *target)
 	}
 	else
 	{
-		self->target3 = G_NewString( target );
+		self->target3 = G_NewString_Safe( target );
 	}
 }
 
@@ -3920,7 +3920,7 @@ static void Q3_SetPainTarget (int entID, const char *targetname)
 	}
 	else
 	{
-		self->paintarget = G_NewString((char *)targetname);
+		self->paintarget = G_NewString_Safe((char *)targetname);
 	}
 	*/
 }
@@ -3950,7 +3950,7 @@ static void Q3_SetFullName (int entID, const char *fullName)
 	}
 	else
 	{
-		self->fullName = G_NewString( fullName );
+		self->fullName = G_NewString_Safe( fullName );
 	}
 }
 
@@ -5553,7 +5553,7 @@ static qboolean Q3_SetBehaviorSet( int entID, int toSet, const char *scriptname)
 //				trap->TagFree( ent->behaviorSet[bSet] );
 			}
 
-			ent->behaviorSet[bSet] = G_NewString( (char *) scriptname );	//FIXME: This really isn't good...
+			ent->behaviorSet[bSet] = G_NewString_Safe( (char *) scriptname );	//FIXME: This really isn't good...
 		}
 
 		//ent->behaviorSet[bSet] = scriptname;

@@ -1864,6 +1864,7 @@ qboolean	G_SpawnVector( const char *key, const char *defaultString, float *out )
 qboolean	G_SpawnBoolean( const char *key, const char *defaultString, qboolean *out );
 void		G_SpawnEntitiesFromString( qboolean inSubBSP );
 char *G_NewString( const char *string );
+char *G_NewString_Safe( const char *string );
 
 //
 // g_cmds.c
