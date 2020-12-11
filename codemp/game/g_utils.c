@@ -35,6 +35,8 @@ shaderRemap_t removedRemappedShaders[MAX_SHADER_REMAPS] = {0};
 
 shaderRemap_t remappedShaders[MAX_SHADER_REMAPS];
 
+shaderRemap_t remappedShaders[MAX_SHADER_REMAPS];
+
 int zyk_get_remap_count()
 {
 	return remapCount;
