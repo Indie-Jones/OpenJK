@@ -2126,7 +2126,7 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC )
 				{
 					continue;
 				}
-				NPC->fullName = G_NewString_Safe(value);
+				NPC->fullName = G_NewString(value);
 				continue;
 			}
 
@@ -2477,7 +2477,7 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC )
 					{
 						*patch = 0;
 					}
-				//	ci->customBasicSoundDir = G_NewString_Safe( sound );
+				//	ci->customBasicSoundDir = G_NewString( sound );
 					//rwwFIXMEFIXME: Hooray for violating client server rules
 				}
 				continue;
@@ -2499,7 +2499,7 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC )
 					{
 						*patch = 0;
 					}
-				//	ci->customCombatSoundDir = G_NewString_Safe( sound );
+				//	ci->customCombatSoundDir = G_NewString( sound );
 				}
 				continue;
 			}
@@ -2520,7 +2520,7 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC )
 					{
 						*patch = 0;
 					}
-				//	ci->customExtraSoundDir = G_NewString_Safe( sound );
+				//	ci->customExtraSoundDir = G_NewString( sound );
 				}
 				continue;
 			}
@@ -2541,7 +2541,7 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC )
 					{
 						*patch = 0;
 					}
-					//ci->customJediSoundDir = G_NewString_Safe( sound );
+					//ci->customJediSoundDir = G_NewString( sound );
 				}
 				continue;
 			}
@@ -2673,7 +2673,7 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC )
 					continue;
 				}
 
-				saberName = (char *)BG_TempAlloc(4096);//G_NewString_Safe( value );
+				saberName = (char *)BG_TempAlloc(4096);//G_NewString( value );
 				strcpy(saberName, value);
 
 				WP_SaberParseParms( saberName, &NPC->client->saber[0] );
@@ -2693,7 +2693,7 @@ qboolean NPC_ParseParms( const char *NPCName, gentity_t *NPC )
 
 				if ( !(NPC->client->saber[0].saberFlags&SFL_TWO_HANDED) )
 				{//can't use a second saber if first one is a two-handed saber...?
-					char *saberName = (char *)BG_TempAlloc(4096);//G_NewString_Safe( value );
+					char *saberName = (char *)BG_TempAlloc(4096);//G_NewString( value );
 					strcpy(saberName, value);
 
 					WP_SaberParseParms( saberName, &NPC->client->saber[1] );

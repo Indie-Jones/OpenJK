@@ -3102,7 +3102,7 @@ void SP_fx_runner( gentity_t *ent )
 	if (fxFile && fxFile[0]) // zyk: added this condition
 	{
 		ent->s.modelindex = G_EffectIndex( fxFile );
-		ent->message = G_NewString_Safe(fxFile); // zyk: used by Entity System to save the effect fxFile, so the effect is loaded properly by entload command
+		ent->message = G_NewString(fxFile); // zyk: used by Entity System to save the effect fxFile, so the effect is loaded properly by entload command
 	}
 
 	// important info transmitted
@@ -3700,7 +3700,7 @@ void GunRackAddItem( gitem_t *gun, vec3_t org, vec3_t angs, float ffwd, float fr
 		}
 
 		it_ent->spawnflags |= 1;// ITMSF_SUSPEND
-		it_ent->classname = G_NewString_Safe(gun->classname);	//copy it so it can be freed safely
+		it_ent->classname = G_NewString(gun->classname);	//copy it so it can be freed safely
 		G_SpawnItem( it_ent, gun );
 
 		// FinishSpawningItem handles everything, so clear the thinkFunc that was set in G_SpawnItem

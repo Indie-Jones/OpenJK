@@ -968,13 +968,13 @@ static void Saber_ParseBrokenSaber1( saberInfo_t *saber, const char **p ) {
 	const char *value;
 	if ( COM_ParseString( p, &value ) )
 		return;
-	//saber->brokenSaber1 = G_NewString_Safe( value );
+	//saber->brokenSaber1 = G_NewString( value );
 }
 static void Saber_ParseBrokenSaber2( saberInfo_t *saber, const char **p ) {
 	const char *value;
 	if ( COM_ParseString( p, &value ) )
 		return;
-	//saber->brokenSaber2 = G_NewString_Safe( value );
+	//saber->brokenSaber2 = G_NewString( value );
 }
 static void Saber_ParseReturnDamage( saberInfo_t *saber, const char **p ) {
 	int n;

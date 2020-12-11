@@ -1405,7 +1405,7 @@ gentity_t *NPC_Spawn_Do( gentity_t *ent )
 		if( ent->count <= 0 )
 		{
 			ent->use = 0;//never again
-			//FIXME: why not remove me...?  Because of all the string pointers?  Just do G_NewString_Safes?
+			//FIXME: why not remove me...?  Because of all the string pointers?  Just do G_NewStrings?
 		}
 	}
 
@@ -1463,7 +1463,7 @@ gentity_t *NPC_Spawn_Do( gentity_t *ent )
 	}
 	else
 	{
-		ent->NPC_type = Q_strlwr( G_NewString_Safe( ent->NPC_type ) );
+		ent->NPC_type = Q_strlwr( G_NewString( ent->NPC_type ) );
 	}
 
 	if ( ent->r.svFlags & SVF_NO_BASIC_SOUNDS )
@@ -1754,7 +1754,7 @@ gentity_t *NPC_Spawn_Do( gentity_t *ent )
 		
 		ent->targetname = NULL;
 
-		//why not remove me...?  Because of all the string pointers?  Just do G_NewString_Safes?
+		//why not remove me...?  Because of all the string pointers?  Just do G_NewStrings?
 		G_FreeEntity(ent);//bye!
 	}
 
@@ -4412,11 +4412,11 @@ gentity_t *NPC_SpawnType( gentity_t *ent, char *npc_type, char *targetname, qboo
 
 	trap->LinkEntity((sharedEntity_t *)NPCspawner);
 
-	NPCspawner->NPC_type = G_NewString_Safe( npc_type );
+	NPCspawner->NPC_type = G_NewString( npc_type );
 
 	if ( targetname )
 	{
-		NPCspawner->NPC_targetname = G_NewString_Safe(targetname);
+		NPCspawner->NPC_targetname = G_NewString(targetname);
 	}
 
 	NPCspawner->count = 1;

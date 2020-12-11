@@ -977,7 +977,7 @@ void SP_target_level_change( gentity_t *self )
 	char *s;
 
 	G_SpawnString( "mapname", "", &s );
-	self->message = G_NewString_Safe(s);
+	self->message = G_NewString(s);
 
 	if ( !self->message || !self->message[0] )
 	{
@@ -1016,7 +1016,7 @@ void SP_target_play_music( gentity_t *self )
 		trap->Error( ERR_DROP, "target_play_music without a music key at %s", vtos( self->s.origin ) );
 	}
 
-	self->message = G_NewString_Safe(s);
+	self->message = G_NewString(s);
 
 	self->use = target_play_music_use;
 }

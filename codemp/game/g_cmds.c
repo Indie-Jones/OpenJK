@@ -7971,7 +7971,7 @@ char *zyk_get_settings_values(gentity_t *ent)
 	// zyk: for compability with older versions, keeping a 0 value here
 	strcpy(content, va("%sON-", content));
 
-	return G_NewString_Safe(content);
+	return G_NewString(content);
 }
 
 /*
@@ -8125,7 +8125,7 @@ char *zyk_get_rpg_chars(gentity_t *ent, char *separator)
 		fclose(chars_file);
 	}
 
-	return G_NewString_Safe(chars);
+	return G_NewString(chars);
 }
 
 /*
@@ -9641,7 +9641,7 @@ void Cmd_ListAccount_f( gentity_t *ent ) {
 			else if (Q_stricmp( arg1, "force" ) == 0 || Q_stricmp( arg1, "weapons" ) == 0 || Q_stricmp( arg1, "other" ) == 0 || 
 					 Q_stricmp( arg1, "ammo" ) == 0 || Q_stricmp( arg1, "items" ) == 0)
 			{
-				zyk_list_player_skills(ent, ent, G_NewString_Safe(arg1));
+				zyk_list_player_skills(ent, ent, G_NewString(arg1));
 			}
 			else if (Q_stricmp( arg1, "quests" ) == 0)
 			{
@@ -12965,7 +12965,7 @@ void Cmd_ZykFile_f(gentity_t *ent) {
 		{ // zyk: search for the string
 			while (i < results_per_page && fgets(content, sizeof(content), server_file) != NULL)
 			{ // zyk: fgets returns NULL at EOF
-				if (strstr(G_NewString_Safe(content), G_NewString_Safe(arg2)))
+				if (strstr(G_NewString(content), G_NewString(arg2)))
 				{
 					strcpy(file_content, va("%s%s", file_content, content));
 					i++;
@@ -13457,7 +13457,7 @@ void Cmd_Remap_f( gentity_t *ent ) {
 		trap->Argv( 2, arg2, sizeof( arg2 ) );
 		trap->Argv( 3, arg3, sizeof( arg3 ) );
 
-		AddRemap(G_NewString_Safe(arg2), G_NewString_Safe(arg3), f);
+		AddRemap(G_NewString(arg2), G_NewString(arg3), f);
 		trap->SetConfigstring(CS_SHADERSTATE, BuildShaderStateConfig());
 
 		trap->SendServerCommand( ent-g_entities, "print \"Shader remapped\n\"" );
@@ -13670,7 +13670,7 @@ void Cmd_RemapLoad_f( gentity_t *ent ) {
 			fscanf(remap_file,"%s",new_shader);
 			fscanf(remap_file,"%s",time_offset);
 
-			AddRemap(G_NewString_Safe(old_shader), G_NewString_Safe(new_shader), atof(time_offset));
+			AddRemap(G_NewString(old_shader), G_NewString(new_shader), atof(time_offset));
 		}
 		
 		fclose(remap_file);
@@ -13777,14 +13777,14 @@ void Cmd_EntAdd_f( gentity_t *ent ) {
 		strcpy(key,"");
 
 		// zyk: setting the entity classname
-		zyk_main_set_entity_field(new_ent, "classname", G_NewString_Safe(arg1));
+		zyk_main_set_entity_field(new_ent, "classname", G_NewString(arg1));
 
 		for(i = 2; i < number_of_args; i++)
 		{
 			if (i % 2 == 0)
 			{ // zyk: key
 				trap->Argv( i, arg2, sizeof( arg2 ) );
-				strcpy(key, G_NewString_Safe(arg2));
+				strcpy(key, G_NewString(arg2));
 
 				if (Q_stricmp(key, "origin") == 0)
 				{ // zyk: if origin was passed
@@ -13800,7 +13800,7 @@ void Cmd_EntAdd_f( gentity_t *ent ) {
 			{ // zyk: value
 				trap->Argv( i, arg2, sizeof( arg2 ) );
 
-				zyk_main_set_entity_field(new_ent, G_NewString_Safe(key), G_NewString_Safe(arg2));
+				zyk_main_set_entity_field(new_ent, G_NewString(key), G_NewString(arg2));
 			}
 		}
 
@@ -13808,12 +13808,12 @@ void Cmd_EntAdd_f( gentity_t *ent ) {
 		{ // zyk: if origin or angles were not passed, use the origin or angles set with /entorigin
 			if (has_origin_set == qfalse)
 			{
-				zyk_main_set_entity_field(new_ent, "origin", G_NewString_Safe(va("%f %f %f", level.ent_origin[0], level.ent_origin[1], level.ent_origin[2])));
+				zyk_main_set_entity_field(new_ent, "origin", G_NewString(va("%f %f %f", level.ent_origin[0], level.ent_origin[1], level.ent_origin[2])));
 			}
 
 			if (has_angles_set == qfalse)
 			{
-				zyk_main_set_entity_field(new_ent, "angles", G_NewString_Safe(va("%f %f %f", level.ent_angles[0], level.ent_angles[1], level.ent_angles[2])));
+				zyk_main_set_entity_field(new_ent, "angles", G_NewString(va("%f %f %f", level.ent_angles[0], level.ent_angles[1], level.ent_angles[2])));
 			}
 		}
 		else if (has_origin_set == qfalse)
@@ -13837,7 +13837,7 @@ void Cmd_EntAdd_f( gentity_t *ent ) {
 
 			if (tr.fraction != 1.0)
 			{ // zyk: hit something
-				zyk_main_set_entity_field(new_ent, "origin", G_NewString_Safe(va("%f %f %f", tr.endpos[0], tr.endpos[1], tr.endpos[2])));
+				zyk_main_set_entity_field(new_ent, "origin", G_NewString(va("%f %f %f", tr.endpos[0], tr.endpos[1], tr.endpos[2])));
 			}
 		}
 
@@ -13937,13 +13937,13 @@ void Cmd_EntEdit_f( gentity_t *ent ) {
 			if (i % 2 == 0)
 			{ // zyk: key
 				trap->Argv(i, arg2, sizeof(arg2));
-				strcpy(key, G_NewString_Safe(arg2));
+				strcpy(key, G_NewString(arg2));
 			}
 			else
 			{ // zyk: value
 				trap->Argv(i, arg2, sizeof(arg2));
 
-				zyk_main_set_entity_field(this_ent, G_NewString_Safe(key), G_NewString_Safe(arg2));
+				zyk_main_set_entity_field(this_ent, G_NewString(key), G_NewString(arg2));
 			}
 		}
 
@@ -14266,9 +14266,9 @@ void Cmd_EntList_f( gentity_t *ent ) {
 			target_ent = &g_entities[i];
 
 			if (target_ent && 
-				((target_ent->classname && strstr(target_ent->classname, G_NewString_Safe(arg1))) ||
-				 (target_ent->targetname && strstr(target_ent->targetname, G_NewString_Safe(arg1))) ||
-				 (target_ent->target && strstr(target_ent->target, G_NewString_Safe(arg1)))))
+				((target_ent->classname && strstr(target_ent->classname, G_NewString(arg1))) ||
+				 (target_ent->targetname && strstr(target_ent->targetname, G_NewString(arg1))) ||
+				 (target_ent->target && strstr(target_ent->target, G_NewString(arg1)))))
 			{
 				sprintf(message,"%s\n%d - %s - %s - %s",message,i,target_ent->classname,target_ent->targetname,target_ent->target);
 				found_entities++;
@@ -15341,7 +15341,7 @@ void Cmd_Players_f( gentity_t *ent ) {
 			if (Q_stricmp(arg2, "force") == 0 || Q_stricmp(arg2, "weapons") == 0 || Q_stricmp(arg2, "other") == 0 || 
 				Q_stricmp(arg2, "ammo") == 0 || Q_stricmp(arg2, "items") == 0)
 			{ // zyk: show skills of the player
-				zyk_list_player_skills(player_ent, ent, G_NewString_Safe(arg2));
+				zyk_list_player_skills(player_ent, ent, G_NewString(arg2));
 			}
 			else if (Q_stricmp(arg2, "stuff") == 0)
 			{ // zyk: lists stuff bought by the player
@@ -15484,7 +15484,7 @@ void Cmd_Saber_f( gentity_t *ent ) {
 	trap->Argv( 1, arg1, sizeof( arg1 ) );
 
 	saber = ent->client->pers.saber1;
-	value = G_NewString_Safe(arg1);
+	value = G_NewString(arg1);
 
 	if ( Q_stricmp( value, saber ) )
 	{
@@ -15500,7 +15500,7 @@ void Cmd_Saber_f( gentity_t *ent ) {
 	else
 	{
 		trap->Argv(2, arg2, sizeof(arg2));
-		value = G_NewString_Safe(arg2);
+		value = G_NewString(arg2);
 	}
 
 	if ( Q_stricmp( value, saber ) )
@@ -16845,7 +16845,7 @@ void Cmd_DuelMode_f(gentity_t *ent) {
 				zyk_set_entity_field(new_ent, "origin", va("%d %d %d", (int)level.duel_tournament_origin[0], (int)level.duel_tournament_origin[1], (int)level.duel_tournament_origin[2]));
 				zyk_set_entity_field(new_ent, "model", "models/map_objects/vjun/globe.md3");
 				zyk_set_entity_field(new_ent, "targetname", "zyk_duel_globe");
-				zyk_set_entity_field(new_ent, "zykmodelscale", G_NewString_Safe(zyk_duel_tournament_arena_scale.string));
+				zyk_set_entity_field(new_ent, "zykmodelscale", G_NewString(zyk_duel_tournament_arena_scale.string));
 
 				zyk_spawn_entity(new_ent);
 
@@ -17505,7 +17505,7 @@ void Cmd_Tutorial_f(gentity_t *ent) {
 		{ // zyk: search for the string
 			while (i < results_per_page && fgets(content, sizeof(content), tutorial_file) != NULL)
 			{ // zyk: fgets returns NULL at EOF
-				if (strstr(G_NewString_Safe(content), G_NewString_Safe(arg1)))
+				if (strstr(G_NewString(content), G_NewString(arg1)))
 				{
 					strcpy(file_content, va("%s%s", file_content, content));
 					i++;
@@ -17725,7 +17725,7 @@ void Cmd_ZykSound_f(gentity_t *ent) {
 
 	trap->Argv(1, arg1, sizeof(arg1));
 
-	G_Sound(ent, CHAN_VOICE, G_SoundIndex(G_NewString_Safe(arg1)));
+	G_Sound(ent, CHAN_VOICE, G_SoundIndex(G_NewString(arg1)));
 }
 
 // zyk: quantity of chars this player has
@@ -18088,7 +18088,7 @@ char *zyk_get_mission_value(int custom_quest, int mission, char *key)
 	{
 		if (Q_stricmp(level.zyk_custom_quest_missions[custom_quest][mission][i], key) == 0)
 		{
-			return G_NewString_Safe(level.zyk_custom_quest_missions[custom_quest][mission][i + 1]);
+			return G_NewString(level.zyk_custom_quest_missions[custom_quest][mission][i + 1]);
 		}
 	}
 
@@ -18207,7 +18207,7 @@ void load_custom_quest_mission()
 	{
 		if (level.zyk_custom_quest_mission_count[i] != -1 && Q_stricmp(level.zyk_custom_quest_main_fields[i][1], "on") == 0)
 		{ // zyk: only set the custom quest map if this is an active quest
-			current_mission = atoi(G_NewString_Safe(level.zyk_custom_quest_main_fields[i][2]));
+			current_mission = atoi(G_NewString(level.zyk_custom_quest_main_fields[i][2]));
 
 			for (j = 0; j < level.zyk_custom_quest_mission_values_count[i][current_mission]/2; j++)
 			{ // zyk: goes through all keys of this mission to find the map keys
@@ -18293,8 +18293,8 @@ void zyk_set_quest_field(int quest_number, int mission_number, char *key, char *
 
 			for (j = 0; j < level.zyk_custom_quest_mission_values_count[quest_number][i + 1]; j += 2)
 			{ // zyk: save all key/value pairs from next mission to this one, it will move all mission by one position
-				level.zyk_custom_quest_missions[quest_number][i][j] = G_NewString_Safe(level.zyk_custom_quest_missions[quest_number][i + 1][j]);
-				level.zyk_custom_quest_missions[quest_number][i][j + 1] = G_NewString_Safe(level.zyk_custom_quest_missions[quest_number][i + 1][j + 1]);
+				level.zyk_custom_quest_missions[quest_number][i][j] = G_NewString(level.zyk_custom_quest_missions[quest_number][i + 1][j]);
+				level.zyk_custom_quest_missions[quest_number][i][j + 1] = G_NewString(level.zyk_custom_quest_missions[quest_number][i + 1][j + 1]);
 			}
 
 			level.zyk_custom_quest_mission_values_count[quest_number][i] = level.zyk_custom_quest_mission_values_count[quest_number][i + 1];
@@ -18319,8 +18319,8 @@ void zyk_set_quest_field(int quest_number, int mission_number, char *key, char *
 				// zyk: moves all keys after this one 2 positions to remove the key
 				while (i < level.zyk_custom_quest_mission_values_count[quest_number][mission_number])
 				{
-					level.zyk_custom_quest_missions[quest_number][mission_number][i - 2] = G_NewString_Safe(level.zyk_custom_quest_missions[quest_number][mission_number][i]);
-					level.zyk_custom_quest_missions[quest_number][mission_number][i - 1] = G_NewString_Safe(level.zyk_custom_quest_missions[quest_number][mission_number][i + 1]);
+					level.zyk_custom_quest_missions[quest_number][mission_number][i - 2] = G_NewString(level.zyk_custom_quest_missions[quest_number][mission_number][i]);
+					level.zyk_custom_quest_missions[quest_number][mission_number][i - 1] = G_NewString(level.zyk_custom_quest_missions[quest_number][mission_number][i + 1]);
 
 					i += 2;
 				}
@@ -18330,8 +18330,8 @@ void zyk_set_quest_field(int quest_number, int mission_number, char *key, char *
 			}
 			else
 			{ // zyk: edit the key
-				level.zyk_custom_quest_missions[quest_number][mission_number][i] = G_NewString_Safe(key);
-				level.zyk_custom_quest_missions[quest_number][mission_number][i + 1] = G_NewString_Safe(value);
+				level.zyk_custom_quest_missions[quest_number][mission_number][i] = G_NewString(key);
+				level.zyk_custom_quest_missions[quest_number][mission_number][i + 1] = G_NewString(value);
 			}
 
 			return;
@@ -18341,8 +18341,8 @@ void zyk_set_quest_field(int quest_number, int mission_number, char *key, char *
 	}
 
 	// zyk: a new key. Add it
-	level.zyk_custom_quest_missions[quest_number][mission_number][i] = G_NewString_Safe(key);
-	level.zyk_custom_quest_missions[quest_number][mission_number][i + 1] = G_NewString_Safe(value);
+	level.zyk_custom_quest_missions[quest_number][mission_number][i] = G_NewString(key);
+	level.zyk_custom_quest_missions[quest_number][mission_number][i + 1] = G_NewString(value);
 
 	// zyk: increases the counter
 	level.zyk_custom_quest_mission_values_count[quest_number][mission_number] += 2;
@@ -18409,10 +18409,10 @@ void Cmd_CustomQuest_f(gentity_t *ent) {
 			}
 
 			// zyk: setting default values of the quest main fields and saving in the quest file
-			level.zyk_custom_quest_main_fields[quest_number][0] = G_NewString_Safe(va("Quest %d", quest_number));
-			level.zyk_custom_quest_main_fields[quest_number][1] = G_NewString_Safe("off");
-			level.zyk_custom_quest_main_fields[quest_number][2] = G_NewString_Safe("0");
-			level.zyk_custom_quest_main_fields[quest_number][3] = G_NewString_Safe("");
+			level.zyk_custom_quest_main_fields[quest_number][0] = G_NewString(va("Quest %d", quest_number));
+			level.zyk_custom_quest_main_fields[quest_number][1] = G_NewString("off");
+			level.zyk_custom_quest_main_fields[quest_number][2] = G_NewString("0");
+			level.zyk_custom_quest_main_fields[quest_number][3] = G_NewString("");
 
 			save_quest_file(quest_number);
 
@@ -18484,17 +18484,17 @@ void Cmd_CustomQuest_f(gentity_t *ent) {
 			// zyk: changing the main quest fields
 			if (Q_stricmp(arg3, "name") == 0)
 			{
-				level.zyk_custom_quest_main_fields[quest_number][0] = G_NewString_Safe(arg4);
+				level.zyk_custom_quest_main_fields[quest_number][0] = G_NewString(arg4);
 			}
 			else if (Q_stricmp(arg3, "active") == 0)
 			{
 				if (Q_stricmp(level.zyk_custom_quest_main_fields[quest_number][1], "on") == 0)
 				{
-					level.zyk_custom_quest_main_fields[quest_number][1] = G_NewString_Safe("off");
+					level.zyk_custom_quest_main_fields[quest_number][1] = G_NewString("off");
 				}
 				else
 				{
-					level.zyk_custom_quest_main_fields[quest_number][1] = G_NewString_Safe("on");
+					level.zyk_custom_quest_main_fields[quest_number][1] = G_NewString("on");
 				}
 
 				// zyk: loads the quests in this map
@@ -18502,7 +18502,7 @@ void Cmd_CustomQuest_f(gentity_t *ent) {
 			}
 			else if (Q_stricmp(arg3, "count") == 0)
 			{
-				level.zyk_custom_quest_main_fields[quest_number][2] = G_NewString_Safe(va("%d", atoi(arg4)));
+				level.zyk_custom_quest_main_fields[quest_number][2] = G_NewString(va("%d", atoi(arg4)));
 			}
 			else
 			{
@@ -18603,7 +18603,7 @@ void Cmd_CustomQuest_f(gentity_t *ent) {
 				trap->Argv(k, arg4, sizeof(arg4));
 				trap->Argv(k + 1, arg5, sizeof(arg5));
 
-				zyk_set_quest_field(quest_number, mission_number, G_NewString_Safe(arg4), G_NewString_Safe(arg5));
+				zyk_set_quest_field(quest_number, mission_number, G_NewString(arg4), G_NewString(arg5));
 			}
 
 			// zyk: saving info in the quest file
