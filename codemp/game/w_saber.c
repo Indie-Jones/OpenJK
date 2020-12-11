@@ -4347,11 +4347,11 @@ static QINLINE qboolean CheckSaberDamage(gentity_t *self, int rSaberNum, int rBl
 			self->client->pers.unique_skill_duration > level.time)
 		{
 			if (self->client->ps.torsoAnim == BOTH_PULL_IMPALE_STAB) // zyk: Impale Stab
-				dmg = 55;
+				dmg = 70;
 			else if (self->client->ps.torsoAnim == BOTH_FORCELEAP2_T__B_) // zyk: Vertical DFA
 				dmg = 28;
-			else if (self->client->ps.torsoAnim == BOTH_ALORA_SPIN_THROW) // zyk: Super Throw
-				dmg = 75;
+			else if (self->client->ps.torsoAnim == BOTH_ALORA_SPIN_SLASH || self->client->ps.torsoAnim == BOTH_ALORA_SPIN_THROW) // zyk: Spin Throw
+				dmg = 55;
 		}
 
 		idleDamage = qtrue;
@@ -6682,7 +6682,7 @@ void WP_SaberAddG2Model( gentity_t *saberent, const char *saberModel, qhandle_t 
 	}
 	else
 	{
-		saberent->s.modelindex = G_ModelIndex( "models/weapons2/saber/saber_w.glm" );
+		saberent->s.modelindex = G_ModelIndex( DEFAULT_SABER_MODEL );
 	}
 	//FIXME: use customSkin?
 	trap->G2API_InitGhoul2Model( &saberent->ghoul2, saberModel, saberent->s.modelindex, saberSkin, 0, 0, 0 );

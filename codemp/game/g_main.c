@@ -330,7 +330,7 @@ G_InitGame
 */
 extern void RemoveAllWP(void);
 extern void BG_ClearVehicleParseParms(void);
-gentity_t *SelectRandomDeathmatchSpawnPoint( void );
+gentity_t *SelectRandomDeathmatchSpawnPoint( qboolean isbot );
 void SP_info_jedimaster_start( gentity_t *ent );
 extern void zyk_create_dir(char *file_path);
 extern void load_custom_quest_mission();
@@ -657,7 +657,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 
 		if ( i == level.num_entities ) {
 			// no JM saber found. drop one at one of the player spawnpoints
-			gentity_t *spawnpoint = SelectRandomDeathmatchSpawnPoint();
+			gentity_t *spawnpoint = SelectRandomDeathmatchSpawnPoint( qfalse );
 
 			if( !spawnpoint ) {
 				trap->Error( ERR_DROP, "Couldn't find an FFA spawnpoint to drop the jedimaster saber at!\n" );
@@ -1070,6 +1070,17 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 		for (i = 0; i < level.num_entities; i++)
 		{
 			ent = &g_entities[i];
+
+			if (Q_stricmp(ent->targetname, "door_trap") == 0)
+			{ // zyk: fixing this door so it will not lock
+				fix_sp_func_door(ent);
+			}
+				
+			if (Q_stricmp(ent->targetname, "lobbydoor1") == 0 || Q_stricmp(ent->targetname, "lobbydoor2") == 0 || 
+				Q_stricmp(ent->targetname, "t7708018") == 0 || Q_stricmp(ent->targetname, "t7708017") == 0)
+			{ // zyk: fixing these doors so they will not lock
+				GlobalUse(ent, ent, ent);
+			}
 
 			if (i == 443)
 			{ // zyk: trigger_hurt at the spawn area
@@ -4740,7 +4751,12 @@ qboolean zyk_check_immunity_power(gentity_t *ent)
 {
 	if (ent && ent->client && ent->client->pers.quest_power_status & (1 << 0))
 	{
-		zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_immunity", "0", "scepter/invincibility", 0, 0, 0, 300);
+		if (ent->client->pers.immunity_power_effect_cooldown < level.time)
+		{
+			zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_immunity", "0", "scepter/invincibility", 0, 0, 0, 300);
+
+			ent->client->pers.immunity_power_effect_cooldown = level.time + 500;
+		}
 
 		return qtrue;
 	}
@@ -5232,6 +5248,8 @@ void immunity_power(gentity_t *ent, int duration)
 {
 	ent->client->pers.quest_power_status |= (1 << 0);
 	ent->client->pers.quest_power1_timer = level.time + duration;
+
+	ent->client->pers.immunity_power_effect_cooldown = level.time + 500;
 
 	zyk_quest_effect_spawn(ent, ent, "zyk_quest_effect_immunity", "0", "scepter/invincibility", 0, 0, 0, 300);
 
@@ -6648,15 +6666,15 @@ qboolean magic_master_has_this_power(gentity_t *ent, int selected_power)
 	{
 		return qfalse;
 	}
-	else if (selected_power == MAGIC_HEALING_AREA && ent->client->pers.skill_levels[55] < 1)
+	else if (selected_power == MAGIC_HEALING_AREA && ent->client->pers.skill_levels[55] < 2)
 	{
 		return qfalse;
 	}
-	else if (selected_power == MAGIC_MAGIC_EXPLOSION && ent->client->pers.skill_levels[55] < 2)
+	else if (selected_power == MAGIC_MAGIC_EXPLOSION && ent->client->pers.skill_levels[55] < 3)
 	{
 		return qfalse;
 	}
-	else if (selected_power == MAGIC_LIGHTNING_DOME && ent->client->pers.skill_levels[55] < 3)
+	else if (selected_power == MAGIC_LIGHTNING_DOME && ent->client->pers.skill_levels[55] < 4)
 	{
 		return qfalse;
 	}
@@ -7322,6 +7340,35 @@ void poison_dart_hits(gentity_t *ent)
 		// zyk: no more do poison damage if counter is 0
 		if (ent->client->pers.poison_dart_hit_counter == 0)
 			ent->client->pers.player_statuses &= ~(1 << 20);
+	}
+}
+
+// zyk: damages target player with Fire Bolt flames
+void fire_bolt_hits(gentity_t* ent)
+{
+	if (ent && ent->client && ent->health > 0 && ent->client->pers.player_statuses & (1 << 29) && ent->client->pers.fire_bolt_hits_counter > 0 &&
+		ent->client->pers.fire_bolt_timer < level.time)
+	{
+		gentity_t* fire_bolt_user = &g_entities[ent->client->pers.fire_bolt_user_id];
+
+		zyk_quest_effect_spawn(fire_bolt_user, ent, "zyk_effect_fire_bolt_hit", "0", "env/fire", 0, 0, 0, 300);
+
+		if (fire_bolt_user->client->pers.unique_skill_duration > level.time && !(fire_bolt_user->client->pers.player_statuses & (1 << 21)) &&
+			!(fire_bolt_user->client->pers.player_statuses & (1 << 22)) && !(fire_bolt_user->client->pers.player_statuses & (1 << 23)))
+		{ // zyk: Unique Skill increases damage
+			G_Damage(ent, fire_bolt_user, fire_bolt_user, NULL, NULL, 6, 0, MOD_UNKNOWN);
+		}
+		else
+		{
+			G_Damage(ent, fire_bolt_user, fire_bolt_user, NULL, NULL, 4, 0, MOD_UNKNOWN);
+		}
+
+		ent->client->pers.fire_bolt_hits_counter--;
+		ent->client->pers.fire_bolt_timer = level.time + 200;
+
+		// zyk: no more do fire bolt damage if counter is 0
+		if (ent->client->pers.fire_bolt_hits_counter == 0)
+			ent->client->pers.player_statuses &= ~(1 << 29);
 	}
 }
 
@@ -9894,17 +9941,17 @@ void G_RunFrame( int levelTime ) {
 			//      then we scale and set it to the jetpackFuel attribute to display the fuel bar correctly to the player
 			if (ent->client->jetPackOn && ent->client->jetPackDebReduce < level.time)
 			{
-				int jetpack_debounce_amount = 20;
+				int jetpack_debounce_amount = 18;
 
 				if (ent->client->sess.amrpgmode == 2)
 				{ // zyk: RPG Mode jetpack skill. Each level decreases fuel debounce
 					if (ent->client->pers.rpg_class == 2)
 					{ // zyk: Bounty Hunter can have a more efficient jetpack
-						jetpack_debounce_amount -= ((ent->client->pers.skill_levels[34] * 3) + (ent->client->pers.skill_levels[55]));
+						jetpack_debounce_amount -= ((ent->client->pers.skill_levels[34] * 2) + (ent->client->pers.skill_levels[55]));
 					}
 					else
 					{
-						jetpack_debounce_amount -= (ent->client->pers.skill_levels[34] * 3);
+						jetpack_debounce_amount -= (ent->client->pers.skill_levels[34] * 2);
 					}
 
 					if (ent->client->pers.secrets_found & (1 << 17)) // zyk: Jetpack Upgrade decreases fuel usage
@@ -10118,6 +10165,7 @@ void G_RunFrame( int levelTime ) {
 
 			quest_power_events(ent);
 			poison_dart_hits(ent);
+			fire_bolt_hits(ent);
 
 			if (zyk_chat_protection_timer.integer > 0)
 			{ // zyk: chat protection. If 0, it is off. If greater than 0, set the timer to protect the player
@@ -10165,7 +10213,8 @@ void G_RunFrame( int levelTime ) {
 
 				// zyk: Stealth Attacker using his Unique Skill, increase firerate of disruptor
 				if (ent->client->ps.weapon == WP_DISRUPTOR && ent->client->pers.rpg_class == 5 && ent->client->pers.skill_levels[38] > 0 && 
-					ent->client->pers.unique_skill_duration > level.time && ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 1.0)/3.0)
+					ent->client->pers.unique_skill_duration > level.time && !(ent->client->pers.player_statuses & (1 << 21)) && 
+					ent->client->ps.weaponTime > (weaponData[WP_DISRUPTOR].fireTime * 1.0)/3.0)
 				{
 					ent->client->ps.weaponTime = (weaponData[WP_DISRUPTOR].fireTime * 1.0)/3.0;
 				}
@@ -10177,9 +10226,9 @@ void G_RunFrame( int levelTime ) {
 
 				// zyk: Monk class has a faster melee fireTime
 				if (ent->client->pers.rpg_class == 4 && ent->client->ps.weapon == WP_MELEE && ent->client->pers.skill_levels[55] > 0 && 
-					ent->client->ps.weaponTime > (weaponData[WP_MELEE].fireTime * 1.8)/(ent->client->pers.skill_levels[55] + 1))
+					ent->client->ps.weaponTime > (weaponData[WP_MELEE].fireTime * 2.25)/(ent->client->pers.skill_levels[55] + 1))
 				{
-					ent->client->ps.weaponTime = (weaponData[WP_MELEE].fireTime * 1.8)/(ent->client->pers.skill_levels[55] + 1);
+					ent->client->ps.weaponTime = (weaponData[WP_MELEE].fireTime * 2.25)/(ent->client->pers.skill_levels[55] + 1);
 				}
 				else if (ent->client->pers.rpg_class == 8 && ent->client->pers.unique_skill_duration > level.time && ent->client->pers.player_statuses & (1 << 21) &&
 					ent->client->ps.weaponTime > (weaponData[WP_MELEE].fireTime * 0.8))
@@ -10224,6 +10273,25 @@ void G_RunFrame( int levelTime ) {
 					{ // zyk: Bounty Hunter Upgrade makes his pistol shoot faster
 						ent->client->ps.weaponTime = weaponData[WP_BRYAR_PISTOL].fireTime * 0.3;
 					}
+				}
+				else if (ent->client->pers.rpg_class == 3 && ent->client->pers.player_statuses & (1 << 21) && ent->client->pers.lightning_shield_timer < level.time)
+				{ // zyk: Armored Soldier Lightning Shield damage to enemies nearby
+					int player_it = 0;
+
+					for (player_it = 0; player_it < level.num_entities; player_it++)
+					{
+						gentity_t* player_ent = &g_entities[player_it];
+
+						if (player_ent && player_ent->client && ent != player_ent &&
+							zyk_unique_ability_can_hit_target(ent, player_ent) == qtrue && Distance(ent->client->ps.origin, player_ent->client->ps.origin) < 60)
+						{
+							G_Damage(player_ent, ent, ent, NULL, NULL, 8, 0, MOD_UNKNOWN);
+
+							player_ent->client->ps.electrifyTime = level.time + 500;
+						}
+					}
+
+					ent->client->pers.lightning_shield_timer = level.time + 200;
 				}
 				else if (ent->client->pers.rpg_class == 4 && 
 						(ent->client->pers.player_statuses & (1 << 22) || ent->client->pers.player_statuses & (1 << 23)) &&
@@ -15569,6 +15637,7 @@ void G_RunFrame( int levelTime ) {
 											int zyk_enemy = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcenemy%d", level.zyk_custom_quest_counter)));
 											int zyk_ally = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcally%d", level.zyk_custom_quest_counter)));
 											int zyk_health = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npchealth%d", level.zyk_custom_quest_counter)));
+											int zyk_boss = atoi(zyk_get_mission_value(level.custom_quest_map, level.zyk_custom_quest_current_mission, va("npcboss%d", level.zyk_custom_quest_counter)));
 
 											zyk_npc->client->pers.player_statuses |= (1 << 28);
 
@@ -15589,6 +15658,11 @@ void G_RunFrame( int levelTime ) {
 											{ // zyk: force it to be ally
 												zyk_npc->client->playerTeam = NPCTEAM_PLAYER;
 												zyk_npc->client->enemyTeam = NPCTEAM_ENEMY;
+											}
+
+											if (zyk_boss > 0)
+											{ // zyk: set it as a Custom Quest boss
+												zyk_npc->client->pers.custom_quest_boss_npc = 1;
 											}
 
 											if (zyk_npc->client->playerTeam == NPCTEAM_PLAYER)
@@ -15750,6 +15824,7 @@ void G_RunFrame( int levelTime ) {
 
 			quest_power_events(ent);
 			poison_dart_hits(ent);
+			fire_bolt_hits(ent);
 
 			if (ent->client->pers.universe_quest_artifact_holder_id != -1 && ent->health > 0 && ent->client->ps.powerups[PW_FORCE_BOON] < (level.time + 1000))
 			{ // zyk: artifact holder npcs. Keep their artifact (force boon) active

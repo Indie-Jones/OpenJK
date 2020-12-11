@@ -2223,6 +2223,7 @@ void ClientThink_real( gentity_t *ent ) {
 	qboolean	isNPC = qfalse;
 	qboolean	controlledByPlayer = qfalse;
 	qboolean	killJetFlags = qtrue;
+	qboolean	isFollowing;
 
 	client = ent->client;
 
@@ -2260,7 +2261,9 @@ void ClientThink_real( gentity_t *ent ) {
 		}
 	}
 
-	if (!(client->ps.pm_flags & PMF_FOLLOW))
+	isFollowing = (client->ps.pm_flags & PMF_FOLLOW) ? qtrue : qfalse;
+
+	if (!isFollowing)
 	{
 		if (level.gametype == GT_SIEGE &&
 			client->siegeClass != -1 &&
@@ -2344,7 +2347,7 @@ void ClientThink_real( gentity_t *ent ) {
 	// mark the time, so the connection sprite can be removed
 	ucmd = &ent->client->pers.cmd;
 
-	if ( client && (client->ps.eFlags2&EF2_HELD_BY_MONSTER) )
+	if ( client && !isFollowing && (client->ps.eFlags2&EF2_HELD_BY_MONSTER) )
 	{
 		G_HeldByMonster( ent, ucmd );
 	}
@@ -2761,7 +2764,7 @@ void ClientThink_real( gentity_t *ent ) {
 		if (client->sess.amrpgmode == 2)
 		{ 
 			if (client->pers.rpg_class == 4) // zyk: each Improvements level increases the Monk speed
-				zyk_player_speed *= (client->pers.skill_levels[55] * 0.3 + 1);
+				zyk_player_speed *= (client->pers.skill_levels[55] * 0.225 + 1);
 			else if (client->pers.rpg_class == 7 && client->pers.secrets_found & (1 << 8)) // zyk: Force Gunner with Upgrade has more run speed
 				zyk_player_speed *= 1.2;
 		}
@@ -3886,7 +3889,8 @@ void ClientThink_real( gentity_t *ent ) {
 												found = 1;
 											}
 
-											if (found == 0 && ent->client->pers.guardian_mode == this_ent->client->pers.guardian_mode)
+											if (found == 0 && ent->client->pers.guardian_mode == this_ent->client->pers.guardian_mode && 
+												this_ent->client->pers.custom_quest_boss_npc == 0)
 											{
 												if (this_ent->client->ps.weapon == WP_SABER)
 												{
@@ -4024,12 +4028,12 @@ void ClientThink_real( gentity_t *ent ) {
 					}
 					else if (ent->client->ps.weapon == WP_MELEE && ent->client->pers.rpg_class == 8)
 					{ // zyk: Magic Master Fist attacks
-						if (ent->client->sess.magic_fist_selection < 4 && ent->client->sess.magic_fist_selection < ent->client->pers.skill_levels[55])
+						if (ent->client->sess.magic_fist_selection < 5 && ent->client->sess.magic_fist_selection < ent->client->pers.skill_levels[55])
 							ent->client->sess.magic_fist_selection++;
-						else if (ent->client->sess.magic_fist_selection == 4)
+						else if (ent->client->sess.magic_fist_selection == 5)
 							ent->client->sess.magic_fist_selection = 0;
 						else
-							ent->client->sess.magic_fist_selection = 4;
+							ent->client->sess.magic_fist_selection = 5;
 
 						save_account(ent, qtrue);
 
@@ -4046,6 +4050,10 @@ void ClientThink_real( gentity_t *ent ) {
 							trap->SendServerCommand(ent->s.number, va("chat \"^7Instant-Hit Bolt  ^3MP: ^7%d\"", ent->client->pers.magic_power));
 						}
 						else if (ent->client->sess.magic_fist_selection == 3)
+						{
+							trap->SendServerCommand(ent->s.number, va("chat \"^7Fire Bolt         ^3MP: ^7%d\"", ent->client->pers.magic_power));
+						}
+						else if (ent->client->sess.magic_fist_selection == 4)
 						{
 							trap->SendServerCommand(ent->s.number, va("chat \"^7Ultra Bolt        ^3MP: ^7%d\"", ent->client->pers.magic_power));
 						}

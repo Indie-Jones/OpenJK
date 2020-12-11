@@ -48,7 +48,11 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
+<<<<<<< HEAD
 #define	GAMEVERSION	"Zyk OpenJK Mod v3.79"
+=======
+#define	GAMEVERSION	"Zyk OpenJK Mod v3.80"
+>>>>>>> master
 
 #define SECURITY_LOG "security.log"
 
@@ -516,10 +520,11 @@ typedef struct clientSession_s {
 	
 	// zyk: activates Magic Fist types
 	// Possible values are:
-	// 0 - Magic Fist
-	// 1 - Fist Charged Attack
-	// 2 - Fist Spray Attack
-	// 3 - No fist attacks
+	// 0 - Normal Bolt
+	// 1 - Electric Bolt
+	// 2 - Instant-Hit Bolt
+	// 3 - Fire Bolt
+	// 4 - Ultra Bolt
 	int magic_fist_selection;
 
 	// zyk: magic powers that will not be shown in Magic power selection
@@ -696,7 +701,11 @@ typedef struct clientPersistant_s {
 	// 26 - Using nofight command
 	// 27 - Has just lost his duel in Duel Tournament
 	// 28 - Custom Quest npc
+	// 29 - hit by Fire Bolt
 	int player_statuses;
+
+	// zyk: setting this to 1 means the npc has the npcboss Custom Quest field
+	int custom_quest_boss_npc;
 
 	// zyk: used to backup player force powers before some event that does not allow them. They will be restored after event ends
 	int zyk_saved_force_powers;
@@ -713,6 +722,11 @@ typedef struct clientPersistant_s {
 
 	// zyk: timer of the poison darts
 	int poison_dart_hit_timer;
+
+	// zyk: timer used to keep spawning fire effects on player who cath fire after neing hit by Fire Bolt
+	int fire_bolt_timer;
+	int fire_bolt_user_id;
+	int fire_bolt_hits_counter;
 
 	// zyk: used by Wrist Shot ability
 	int wrist_shot_counter;
@@ -798,6 +812,9 @@ typedef struct clientPersistant_s {
 
 	// zyk: Monk Spin Kick ability interval between hits. Also used by Monk Meditation Drain ability as interval between hits
 	int monk_unique_timer;
+
+	// zyk: Lightning Shield timer to hit targets near the Armored Soldier
+	int lightning_shield_timer;
 
 	// zyk: used by Fast Dash ability
 	int fast_dash_timer;
@@ -1037,6 +1054,9 @@ typedef struct clientPersistant_s {
 
 	// zyk: sets the id of the effect of the magic used by this player
 	int quest_power_effect1_id;
+
+	// zyk: interval between each time the Immunity Power effect is shown to avoid spamming too many effects
+	int immunity_power_effect_cooldown;
 
 	// zyk: magic power, required to use Special Powers
 	int magic_power;
@@ -1852,7 +1872,10 @@ typedef struct shaderRemap_s {
 extern shaderRemap_t remappedShaders[MAX_SHADER_REMAPS];
 extern shaderRemap_t removedRemappedShaders[MAX_SHADER_REMAPS];
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
 //
 // g_spawn.c
 //
