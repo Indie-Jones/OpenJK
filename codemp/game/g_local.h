@@ -48,15 +48,7 @@ extern vec3_t gPainPoint;
 //==================================================================
 
 // the "gameversion" client command will print this plus compile date
-<<<<<<< HEAD
-<<<<<<< HEAD
-#define	GAMEVERSION	"Zyk OpenJK Mod v3.79"
-=======
 #define	GAMEVERSION	"Zyk OpenJK Mod v3.80"
->>>>>>> master
-=======
-#define	GAMEVERSION	"Zyk OpenJK Mod v3.80"
->>>>>>> master
 
 #define SECURITY_LOG "security.log"
 
@@ -1876,13 +1868,6 @@ typedef struct shaderRemap_s {
 extern shaderRemap_t remappedShaders[MAX_SHADER_REMAPS];
 extern shaderRemap_t removedRemappedShaders[MAX_SHADER_REMAPS];
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
->>>>>>> master
-=======
->>>>>>> master
 //
 // g_spawn.c
 //
