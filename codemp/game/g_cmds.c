@@ -5064,7 +5064,7 @@ qboolean zyk_check_user_input(char *user_input, int user_input_size)
 {
 	int i = 0;
 
-	char allowed_chars[63] = {
+	char allowed_chars[] = {
 		'A',
 		'B',
 		'C',
@@ -5127,6 +5127,7 @@ qboolean zyk_check_user_input(char *user_input, int user_input_size)
 		'7',
 		'8',
 		'9',
+		'_',
 		'\0'
 	};
 
@@ -5144,7 +5145,7 @@ qboolean zyk_check_user_input(char *user_input, int user_input_size)
 	{
 		int j = 0;
 
-		while (j < 63)
+		while (j < sizeof(allowed_chars) / sizeof(allowed_chars[0]))
 		{
 			if (allowed_chars[j] == user_input[i])
 			{ // zyk: char is an allowed one. Go to the next char
