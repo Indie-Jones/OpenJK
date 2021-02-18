@@ -733,6 +733,9 @@ typedef struct clientPersistant_s {
 	// zyk: cooldown time to buy or sell
 	int buy_sell_timer;
 
+	// cooldown time to remote buy or sell
+	int remote_buy_sell_timer;
+
 	int player_scale;
 
 	// zyk: chat protection cooldown timer. After this time, player will be protected against damage

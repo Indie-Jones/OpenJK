@@ -5852,6 +5852,7 @@ void initialize_rpg_skills(gentity_t *ent)
 		ent->client->pers.score_modifier = 0;
 
 		ent->client->pers.buy_sell_timer = 0;
+		ent->client->pers.remote_buy_sell_timer = 0;
 		ent->client->pers.vertical_dfa_timer = 0;
 
 		// zyk: setting default value of can_play_quest
@@ -9091,6 +9092,9 @@ void Cmd_Buy_f( gentity_t *ent ) {
 	trap->Argv(1, arg1, sizeof( arg1 ));
 	value = atoi(arg1);
 
+	// if the player's rpg class is not bounty hunter, the timer should always be 0
+	assert(ent->client->pers.rpg_class == 2 || ent->client->pers.remote_buy_sell_timer == 0);
+
 	// zyk: tests the cooldown time to buy or sell
 	if (ent->client->pers.buy_sell_timer > level.time)
 	{
@@ -9123,6 +9127,13 @@ void Cmd_Buy_f( gentity_t *ent ) {
 				found = 1;
 				break;
 			}
+		}
+
+		// test the cooldown time to remote buy or sell for bounty hunter
+		if (found == 0 && ent->client->pers.remote_buy_sell_timer > level.time)
+		{
+			trap->SendServerCommand(ent->s.number, "print \"In remote Buy/Sell cooldown time.\n\"");
+			return;
 		}
 
 		if (found == 0 && !(ent->client->pers.rpg_class == 2 && ent->client->pers.secrets_found & (1 << 1)))
@@ -9539,7 +9550,7 @@ void Cmd_Buy_f( gentity_t *ent ) {
 		// zyk: setting the cooldown time to buy and sell stuff. Bounty Hunter remote buying system has its own cooldown time cvar
 		if (ent->client->pers.rpg_class == 2 && ent->client->pers.secrets_found & (1 << 1) && found == 0)
 		{
-			ent->client->pers.buy_sell_timer = level.time + zyk_bh_remote_buying_cooldown.integer;
+			ent->client->pers.remote_buy_sell_timer = level.time + zyk_bh_remote_buying_cooldown.integer;
 		}
 		else
 		{
@@ -9595,6 +9606,9 @@ void Cmd_Sell_f( gentity_t *ent ) {
 	trap->Argv(1, arg1, sizeof( arg1 ));
 	value = atoi(arg1);
 
+	// if the player's rpg class is not bounty hunter, the remote buy/sell timer should always be 0
+	assert(ent->client->pers.rpg_class == 2 || ent->client->pers.remote_buy_sell_timer == 0);
+
 	// zyk: tests the cooldown time to buy or sell
 	if (ent->client->pers.buy_sell_timer > level.time)
 	{
@@ -9627,6 +9641,13 @@ void Cmd_Sell_f( gentity_t *ent ) {
 				found = 1;
 				break;
 			}
+		}
+
+		// test the cooldown time to remote buy or sell for bounty hunter
+		if (found == 0 && ent->client->pers.remote_buy_sell_timer > level.time)
+		{
+			trap->SendServerCommand(ent->s.number, "print \"In remote Buy/Sell cooldown time.\n\"");
+			return;
 		}
 
 		// zyk: Bounty Hunter Upgrade allows buying and selling without the need to call the jawa seller
@@ -9814,7 +9835,7 @@ void Cmd_Sell_f( gentity_t *ent ) {
 		// zyk: setting the cooldown time to buy and sell stuff. Bounty Hunter remote buying system has its own cooldown time cvar
 		if (ent->client->pers.rpg_class == 2 && ent->client->pers.secrets_found & (1 << 1) && found == 0)
 		{
-			ent->client->pers.buy_sell_timer = level.time + zyk_bh_remote_buying_cooldown.integer;
+			ent->client->pers.remote_buy_sell_timer = level.time + zyk_bh_remote_buying_cooldown.integer;
 		}
 		else
 		{
